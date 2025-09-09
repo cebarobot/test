@@ -37,8 +37,8 @@ body:
     attributes:
       label: Document Language 文档语言
       options:
-        - English 
         - Chinese
+        - English 
         - Other
     validations:
       required: true
@@ -66,13 +66,10 @@ body:
   - type: input
     id: location
     attributes:
-      label: Web URL or PDF Page 网页链接或 PDF 页码
+      label: Issue Location 问题位置
       description: |
-        - For **web version**, paste the URL.
-        - For **PDF version**, specify the page number.
-
-        - **网页版本**：请粘贴 URL  
-        - **PDF 版本**：请写明页码  
+        For web version, paste the URL; For PDF version, specify the page number.
+        对于网页版本，请粘贴 URL；对于 PDF 版本，请写明页码。
       placeholder: "https://... (web) | Page 42 (PDF)"
     validations:
       required: true
@@ -81,16 +78,18 @@ body:
     id: section
     attributes:
       label: Section Title (from top to bottom) 章节标题（从大到小）
-      description: Provide the section hierarchy to help locate the issue.  
-                  请按照从大到小的顺序提供章节标题。  
+      description: |
+        Provide the section hierarchy to help locate the issue.
+        请按照从大到小的顺序提供章节标题。
       placeholder: "Chapter > Section > Subsection | 章 > 节 > 小节"
 
   - type: input
     id: source-md
     attributes:
       label: Source File 源文件
-      description: If possible, provide the relative path of the Markdown file in the repository.  
-                  如果可能，请提供仓库中 Markdown 文件的相对路径。  
+      description: |
+        If possible, provide the relative path of the Markdown file in the repository.
+        如果可能，请提供仓库中 Markdown 文件的相对路径。
       placeholder: "e.g. docs/user-guide/installation.md"
 
   - type: dropdown
