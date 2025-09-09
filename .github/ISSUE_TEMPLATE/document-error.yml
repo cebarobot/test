@@ -1,0 +1,100 @@
+name: Documentation Error Report | 文档错误报告
+description: Report an error or suggest an improvement in the documentation | 提交文档错误或改进建议
+title: "[Doc Error] Briefly describe the issue | 简要描述问题"
+labels: ["documentation", "bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Thank you for reporting a documentation issue! 🙏  
+        Please provide as much detail as possible to help us locate and fix it quickly.  
+
+        ## 感谢您提交文档问题！🙏  
+        请尽可能详细填写以下信息，以帮助我们快速定位和修复。
+
+  - type: input
+    id: link
+    attributes:
+      label: Document Title / Page Link | 文档标题 / 页面链接
+      description: Provide the document title or full link | 请提供文档的标题或完整链接
+      placeholder: "e.g. https://github.com/org/repo/docs/page.md | 例如：https://github.com/org/repo/docs/page.md"
+    validations:
+      required: true
+
+  - type: input
+    id: section
+    attributes:
+      label: Section / Paragraph | 章节 / 段落位置
+      description: Optional, helps to locate the exact section | 可选，帮助快速定位到具体段落
+      placeholder: "e.g. Chapter 2 · Section 1.2 | 例如：第二章 · 1.2 小节"
+
+  - type: dropdown
+    id: language
+    attributes:
+      label: Document Language | 文档语言
+      options:
+        - English | 英文
+        - Chinese | 中文
+        - Other | 其他
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Reading Environment | 阅读环境
+      options:
+        - GitHub Page | GitHub 页面
+        - PDF | PDF
+        - Offline Version | 离线版
+        - Other | 其他
+
+  - type: input
+    id: version
+    attributes:
+      label: Document Version / Commit Hash | 文档版本 / 提交哈希
+      description: Optional, helps us confirm the specific version | 可选，帮助我们确认具体版本
+      placeholder: "e.g. commit abc123 or 2025-09-09 | 例如：commit abc123 或 2025-09-09"
+
+  - type: dropdown
+    id: error_type
+    attributes:
+      label: Error Type | 错误类型
+      options:
+        - Typo | 拼写
+        - Format | 格式
+        - Broken Link | 链接失效
+        - Technical Content Error | 技术内容错误
+        - Other | 其他
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Error Description | 错误描述
+      description: Clearly describe the problem you found | 清晰地描述您发现的问题
+      placeholder: "Explain the issue in detail, e.g., which sentence has a typo or incorrect content | 详细说明问题，例如哪一段文字有拼写错误或内容不正确"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Screenshot or Steps to Reproduce | 截图或复现步骤
+      description: Provide screenshots or steps if the issue is about formatting or commands | 如果问题涉及显示或命令运行错误，请提供截图或复现步骤
+      placeholder: "Optional | 可选"
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested Fix | 建议的修改方案
+      description: Provide your suggestion if you have one | 如果您有明确建议，请在这里写下
+      placeholder: "e.g., change to xxx | 例如：建议改为 xxx"
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes | 备注信息
+      description: Any other information or related issues | 任何其他补充说明
+      placeholder: "e.g., may be related to #123 | 例如：此问题可能与 #123 相关"
