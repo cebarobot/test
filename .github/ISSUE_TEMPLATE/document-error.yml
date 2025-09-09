@@ -1,16 +1,41 @@
-name: Documentation Error Report | 文档错误报告
-description: Report an error or suggest an improvement in the documentation | 提交文档错误或改进建议
-title: "[Doc Error] Briefly describe the issue | 简要描述问题"
-labels: ["documentation", "bug"]
+name: Documentation Error Report
+description: Report an error or suggest an improvement in the documentation
+labels:
+  - 'type: bug/reported'
 body:
   - type: markdown
     attributes:
       value: |
-        ## Thank you for reporting a documentation issue! 🙏  
-        Please provide as much detail as possible to help us locate and fix it quickly.  
+        Thank you for reporting a documentation issue! You could use English or Chinese to open an issue.
+        感谢您提交文档问题！您可以使用中文或英文提交议题。
 
-        ## 感谢您提交文档问题！🙏  
+        This template is only used for reporting an error of XiangShan Documentation (User-Guide). 
+
+        This template is intended only for reporting issues of XiangShan Documentation (User-Guide). If your issue concerns other parts of the documentation or the Xiangshan processor cores themselves, please go back and select a different option.
+        此模板仅用于提报香山文档（用户手册）本身的问题。如果您的问题涉及文档的其他部分，或与香山处理器核本身相关，请返回并选择其他选项。
+        
+        Please provide as much detail as possible to help us locate and fix it quickly.
         请尽可能详细填写以下信息，以帮助我们快速定位和修复。
+
+  - type: checkboxes
+    id: before-start
+    attributes:
+      label: Before start
+      description: |
+        Before start, PLEASE MAKE SURE you have done these:
+        开始之前，请确保您已经做过以下事情：
+      options:
+        - label: I have checked the [XiangShan Contribution guide for Documentation](https://docs.xiangshan.cc/zh-cn/latest/contribution/documentation/) 我已阅读[香山文档贡献指南](https://docs.xiangshan.cc/zh-cn/latest/contribution/documentation/)。
+          required: true
+        - label: I have searched the existing issues and did not find a similar report. 我已经搜索过已有的 issue，没有找到类似的问题。
+          required: true
+        - label: I have checked the latest version of the user manual and the problem still exists. 我已经确认使用的是用户手册的最新版本，问题依然存在。
+          required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Document Infomation
 
   - type: input
     id: link
@@ -55,6 +80,11 @@ body:
       label: Document Version / Commit Hash | 文档版本 / 提交哈希
       description: Optional, helps us confirm the specific version | 可选，帮助我们确认具体版本
       placeholder: "e.g. commit abc123 or 2025-09-09 | 例如：commit abc123 或 2025-09-09"
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Error Description
 
   - type: dropdown
     id: error_type
