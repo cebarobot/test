@@ -20,7 +20,7 @@ body:
   - type: checkboxes
     id: before-start
     attributes:
-      label: Before start
+      label: Before start 开始之前
       description: |
         Before start, PLEASE MAKE SURE you have done these:
         开始之前，请确保您已经做过以下事情：
@@ -32,99 +32,117 @@ body:
         - label: I have checked the latest version of the user manual and the problem still exists. 我已经确认使用的是用户手册的最新版本，问题依然存在。
           required: true
 
-  - type: markdown
-    attributes:
-      value: |
-        ## Document Infomation
-
-  - type: input
-    id: link
-    attributes:
-      label: Document Title / Page Link | 文档标题 / 页面链接
-      description: Provide the document title or full link | 请提供文档的标题或完整链接
-      placeholder: "e.g. https://github.com/org/repo/docs/page.md | 例如：https://github.com/org/repo/docs/page.md"
-    validations:
-      required: true
-
-  - type: input
-    id: section
-    attributes:
-      label: Section / Paragraph | 章节 / 段落位置
-      description: Optional, helps to locate the exact section | 可选，帮助快速定位到具体段落
-      placeholder: "e.g. Chapter 2 · Section 1.2 | 例如：第二章 · 1.2 小节"
-
   - type: dropdown
     id: language
     attributes:
-      label: Document Language | 文档语言
+      label: Document Language 文档语言
       options:
-        - English | 英文
-        - Chinese | 中文
-        - Other | 其他
+        - English 
+        - Chinese
+        - Other
     validations:
       required: true
 
   - type: dropdown
     id: environment
     attributes:
-      label: Reading Environment | 阅读环境
+      label: Document Format 文档形式
       options:
-        - GitHub Page | GitHub 页面
-        - PDF | PDF
-        - Offline Version | 离线版
-        - Other | 其他
+        - Web
+        - PDF
+        - Other
+    validations:
+      required: true
 
   - type: input
     id: version
     attributes:
-      label: Document Version / Commit Hash | 文档版本 / 提交哈希
-      description: Optional, helps us confirm the specific version | 可选，帮助我们确认具体版本
-      placeholder: "e.g. commit abc123 or 2025-09-09 | 例如：commit abc123 或 2025-09-09"
+      label: Document Version 文档版本
+      description: |
+        Please provide the tag / release / commit hash of the document to help us confirm the specific version.
+        请提供文档的标签、发行版或提交哈希，以便确定版本。
+      placeholder: "latest | release Kunminghu-v2r2-alpha1 | commit x1s2x3s"
 
-  - type: markdown
+  - type: input
+    id: location
     attributes:
-      value: |
-        ## Error Description
+      label: Web URL or PDF Page 网页链接或 PDF 页码
+      description: |
+        - For **web version**, paste the URL.
+        - For **PDF version**, specify the page number.
+
+        - **网页版本**：请粘贴 URL  
+        - **PDF 版本**：请写明页码  
+      placeholder: "https://... (web) | Page 42 (PDF)"
+    validations:
+      required: true
+
+  - type: input
+    id: section
+    attributes:
+      label: Section Title (from top to bottom) 章节标题（从大到小）
+      description: Provide the section hierarchy to help locate the issue.  
+                  请按照从大到小的顺序提供章节标题。  
+      placeholder: "Chapter > Section > Subsection | 章 > 节 > 小节"
+
+  - type: input
+    id: source-md
+    attributes:
+      label: Source File 源文件
+      description: If possible, provide the relative path of the Markdown file in the repository.  
+                  如果可能，请提供仓库中 Markdown 文件的相对路径。  
+      placeholder: "e.g. docs/user-guide/installation.md"
 
   - type: dropdown
     id: error_type
     attributes:
-      label: Error Type | 错误类型
+      label: Error Type 错误类型
       options:
-        - Typo | 拼写
-        - Format | 格式
-        - Broken Link | 链接失效
-        - Technical Content Error | 技术内容错误
-        - Other | 其他
+        - Typo 笔误
+        - Format 格式
+        - Translation 翻译
+        - Broken Link 链接失效
+        - Technical Content Error 技术内容错误
+        - Other 其他
     validations:
       required: true
 
   - type: textarea
     id: description
     attributes:
-      label: Error Description | 错误描述
-      description: Clearly describe the problem you found | 清晰地描述您发现的问题
-      placeholder: "Explain the issue in detail, e.g., which sentence has a typo or incorrect content | 详细说明问题，例如哪一段文字有拼写错误或内容不正确"
+      label: Error Description 错误描述
+      description: |
+        Clearly describe the problem you found.
+        清晰地描述您发现的问题。
+      placeholder: |
+        Explain the issue in detail, e.g., which sentence has a typo or incorrect content.
+        详细说明问题，例如哪一段文字有拼写错误或内容不正确。
     validations:
       required: true
 
   - type: textarea
     id: reproduce
     attributes:
-      label: Screenshot or Steps to Reproduce | 截图或复现步骤
-      description: Provide screenshots or steps if the issue is about formatting or commands | 如果问题涉及显示或命令运行错误，请提供截图或复现步骤
-      placeholder: "Optional | 可选"
+      label: Screenshot 截图
+      description: |
+        Provide screenshots if the issue is about formatting.
+        如果问题涉及显示，请提供截图。
 
   - type: textarea
     id: suggestion
     attributes:
-      label: Suggested Fix | 建议的修改方案
-      description: Provide your suggestion if you have one | 如果您有明确建议，请在这里写下
-      placeholder: "e.g., change to xxx | 例如：建议改为 xxx"
+      label: Suggested Fix 建议的修改方案
+      description: |
+        Provide your suggestion if you have one.
+        如果您有明确建议，请在这里写下。
+      placeholder: |
+        e.g., change to xxx
+        例如：建议改为 xxx"
 
   - type: textarea
     id: notes
     attributes:
-      label: Additional Notes | 备注信息
-      description: Any other information or related issues | 任何其他补充说明
-      placeholder: "e.g., may be related to #123 | 例如：此问题可能与 #123 相关"
+      label: Additional Notes 备注信息
+      description: |
+        Any other information or related issues.
+        任何其他补充说明。
