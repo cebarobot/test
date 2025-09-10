@@ -6,6 +6,7 @@ on:
 
 jobs:
   manage-claim:
+    if: github.event.issue.number == 5
     runs-on: ubuntu-latest
     steps:
       - name: Parse command
@@ -14,6 +15,8 @@ jobs:
         with:
           script: |
             const body = context.payload.comment.body.trim();
+            core.info(`收到评论: "${body}"`);
+
             let action = null;
             let file = null;
 
@@ -24,12 +27,13 @@ jobs:
             if (claimMatch) {
               action = "claim";
               file = claimMatch[1].trim();
+              core.info(`解析到命令: claim ${file}`);
             } else if (unclaimMatch) {
               action = "unclaim";
               file = unclaimMatch[1].trim();
-            }
-
-            if (!action) {
+              core.info(`解析到命令: unclaim ${file}`);
+            } else {
+              core.info("未匹配到有效命令，跳过。");
               core.setOutput("do", "false");
               return;
             }
@@ -40,81 +44,4 @@ jobs:
 
       - name: Process claim/unclaim
         if: steps.parse.outputs.do == 'true'
-        id: process
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const action = core.getInput("action");
-            const filePath = core.getInput("file");
-            const user = context.payload.comment.user.login;
-            const commentId = context.payload.comment.id;
-
-            // 固定监控的 issue
-            const issue_number = 5;  // 替换为你的 issue ID
-            const { data: issue } = await github.rest.issues.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number
-            });
-
-            let body = issue.body;
-            // 匹配 "* path/to/file.md ( ... )"
-            const regex = new RegExp(`^(\\*\\s+${filePath}\\s*\\()(.*?)(\\))`, "m");
-            const match = body.match(regex);
-
-            if (!match) {
-              core.setOutput("status", "fail");
-              return;
-            }
-
-            let currentClaimers = match[2].trim();
-            let claimers = currentClaimers
-              ? currentClaimers.split(",").map(s => s.trim()).filter(Boolean)
-              : [];
-
-            if (action === "claim") {
-              if (!claimers.includes(`@${user}`)) {
-                claimers.push(`@${user}`);
-              }
-            } else if (action === "unclaim") {
-              claimers = claimers.filter(c => c !== `@${user}`);
-            }
-
-            let newContent = claimers.length > 0 ? claimers.join(", ") : "";
-            const newLine = `${match[1]}${newContent}${match[3]}`;
-            body = body.replace(regex, newLine);
-
-            await github.rest.issues.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number,
-              body
-            });
-
-            core.setOutput("status", "success");
-
-      - name: Add reaction
-        if: steps.process.outputs.status == 'success'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const commentId = context.payload.comment.id;
-            await github.rest.reactions.createForIssueComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: commentId,
-              content: "✅"
-            });
-
-      - name: Add reaction (fail)
-        if: steps.process.outputs.status == 'fail'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const commentId = context.payload.comment.id;
-            await github.rest.reactions.createForIssueComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: commentId,
-              content: "⚠️"
-            });
+        id
