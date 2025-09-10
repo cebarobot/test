@@ -39,8 +39,8 @@ jobs:
             }
 
             core.setOutput("do", "true");
-            core.setOutput("action", action);
-            core.setOutput("file", file);
+            core.exportVariable("action", action);
+            core.exportVariable("file", file);
 
       - name: Process claim/unclaim
         if: steps.parse.outputs.do == 'true'
@@ -48,8 +48,8 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const action = core.getInput("action");
-            const filePath = core.getInput("file");
+            const action = process.env.action;
+            const filePath = process.env.file;
             const user = context.payload.comment.user.login;
             core.info(`开始处理 ${action}，用户: @${user}，文件: ${filePath}`);
 
