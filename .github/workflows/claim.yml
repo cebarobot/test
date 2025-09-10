@@ -44,4 +44,93 @@ jobs:
 
       - name: Process claim/unclaim
         if: steps.parse.outputs.do == 'true'
-        id
+        id: process
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const action = core.getInput("action");
+            const filePath = core.getInput("file");
+            const user = context.payload.comment.user.login;
+            core.info(`开始处理 ${action}，用户: @${user}，文件: ${filePath}`);
+
+            const { data: issue } = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+
+            let body = issue.body;
+            core.info("成功获取 issue body");
+
+            const regex = new RegExp(`^(\\*\\s+${filePath}\\s*\\()(.*?)(\\))`, "m");
+            const match = body.match(regex);
+
+            if (!match) {
+              core.warning(`文件 ${filePath} 未在 issue 列表中找到，或格式不匹配`);
+              core.setOutput("status", "fail");
+              return;
+            }
+
+            let currentClaimers = match[2].trim();
+            let claimers = currentClaimers
+              ? currentClaimers.split(",").map(s => s.trim()).filter(Boolean)
+              : [];
+
+            core.info(`当前认领人: [${claimers.join(", ")}]`);
+
+            if (action === "claim") {
+              if (!claimers.includes(`@${user}`)) {
+                claimers.push(`@${user}`);
+                core.info(`已添加认领人 @${user}`);
+              } else {
+                core.info(`用户 @${user} 已经认领过 ${filePath}`);
+              }
+            } else if (action === "unclaim") {
+              const before = claimers.length;
+              claimers = claimers.filter(c => c !== `@${user}`);
+              if (claimers.length < before) {
+                core.info(`已移除认领人 @${user}`);
+              } else {
+                core.info(`用户 @${user} 并未认领 ${filePath}`);
+              }
+            }
+
+            let newContent = claimers.length > 0 ? claimers.join(", ") : "";
+            const newLine = `${match[1]}${newContent}${match[3]}`;
+            body = body.replace(regex, newLine);
+
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
+
+            core.info(`更新成功，文件 ${filePath} 的认领人变更为: [${claimers.join(", ")}]`);
+            core.setOutput("status", "success");
+
+      - name: Add reaction (success)
+        if: steps.process.outputs.status == 'success'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: "✅"
+            });
+            core.info("已添加成功反应 ✅");
+
+      - name: Add reaction (fail)
+        if: steps.process.outputs.status == 'fail'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: "⚠️"
+            });
+            core.info("已添加失败反应 ⚠️");
