@@ -15,25 +15,25 @@ jobs:
         with:
           script: |
             const body = context.payload.comment.body.trim();
-            core.info(`收到评论: "${body}"`);
+            core.info(`Received comment: "${body}"`);
 
             let action = null;
             let file = null;
 
-            // 匹配 \claim 和 \unclaim
+            // Match \claim and \unclaim
             let claimMatch = body.match(/^\\claim\s+(.+)$/);
             let unclaimMatch = body.match(/^\\unclaim\s+(.+)$/);
 
             if (claimMatch) {
               action = "claim";
               file = claimMatch[1].trim();
-              core.info(`解析到命令: claim ${file}`);
+              core.info(`Parsed command: claim ${file}`);
             } else if (unclaimMatch) {
               action = "unclaim";
               file = unclaimMatch[1].trim();
-              core.info(`解析到命令: unclaim ${file}`);
+              core.info(`Parsed command: unclaim ${file}`);
             } else {
-              core.info("未匹配到有效命令，跳过。");
+              core.info("No valid command matched, skipping.");
               core.setOutput("do", "false");
               return;
             }
@@ -51,7 +51,7 @@ jobs:
             const action = process.env.action;
             const filePath = process.env.file;
             const user = context.payload.comment.user.login;
-            core.info(`开始处理 ${action}，用户: @${user}，文件: ${filePath}`);
+            core.info(`Start processing ${action}, user: @${user}, file: ${filePath}`);
 
             const { data: issue } = await github.rest.issues.get({
               owner: context.repo.owner,
@@ -60,13 +60,13 @@ jobs:
             });
 
             let body = issue.body;
-            core.info("成功获取 issue body");
+            core.info("Successfully retrieved issue body");
 
             const regex = new RegExp(`^(\\*\\s+${filePath}\\s*\\()(.*?)(\\))`, "m");
             const match = body.match(regex);
 
             if (!match) {
-              core.warning(`文件 ${filePath} 未在 issue 列表中找到，或格式不匹配`);
+              core.warning(`File ${filePath} was not found in the issue list, or the format does not match`);
               core.setOutput("status", "fail");
               return;
             }
@@ -76,22 +76,22 @@ jobs:
               ? currentClaimers.split(",").map(s => s.trim()).filter(Boolean)
               : [];
 
-            core.info(`当前认领人: [${claimers.join(", ")}]`);
+            core.info(`Current claimers: [${claimers.join(", ")}]`);
 
             if (action === "claim") {
               if (!claimers.includes(`@${user}`)) {
                 claimers.push(`@${user}`);
-                core.info(`已添加认领人 @${user}`);
+                core.info(`Added claimer @${user}`);
               } else {
-                core.info(`用户 @${user} 已经认领过 ${filePath}`);
+                core.info(`User @${user} has already claimed ${filePath}`);
               }
             } else if (action === "unclaim") {
               const before = claimers.length;
               claimers = claimers.filter(c => c !== `@${user}`);
               if (claimers.length < before) {
-                core.info(`已移除认领人 @${user}`);
+                core.info(`Removed claimer @${user}`);
               } else {
-                core.info(`用户 @${user} 并未认领 ${filePath}`);
+                core.info(`User @${user} has not claimed ${filePath}`);
               }
             }
 
@@ -106,7 +106,7 @@ jobs:
               body
             });
 
-            core.info(`更新成功，文件 ${filePath} 的认领人变更为: [${claimers.join(", ")}]`);
+            core.info(`Update successful, claimers for file ${filePath} are now: [${claimers.join(", ")}]`);
             core.setOutput("status", "success");
 
       - name: Add reaction (success)
@@ -120,7 +120,7 @@ jobs:
               comment_id: context.payload.comment.id,
               content: "+1"
             });
-            core.info("已添加成功反应 +1");
+            core.info("Added success reaction +1");
 
       - name: Add reaction (fail)
         if: steps.process.outputs.status == 'fail'
@@ -133,4 +133,4 @@ jobs:
               comment_id: context.payload.comment.id,
               content: "confused"
             });
-            core.info("已添加失败反应 confused");
+            core.info("Added failure reaction confused");
