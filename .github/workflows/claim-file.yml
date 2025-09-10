@@ -1,4 +1,5 @@
-name: Claim/Unclaim File
+name: Claim File Task
+run-name: Response to issue comment command
 
 on:
   issue_comment:
