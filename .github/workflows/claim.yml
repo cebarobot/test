@@ -118,9 +118,9 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               comment_id: context.payload.comment.id,
-              content: "✅"
+              content: "+1"
             });
-            core.info("已添加成功反应 ✅");
+            core.info("已添加成功反应 +1");
 
       - name: Add reaction (fail)
         if: steps.process.outputs.status == 'fail'
