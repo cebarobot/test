@@ -131,6 +131,6 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               comment_id: context.payload.comment.id,
-              content: "⚠️"
+              content: "confused"
             });
-            core.info("已添加失败反应 ⚠️");
+            core.info("已添加失败反应 confused");
