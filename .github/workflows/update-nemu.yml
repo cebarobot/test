@@ -1,0 +1,90 @@
+name: Update NEMU difftest-so
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "NEMU commit hash (optional, default: latest master)"
+        required: false
+        default: ""
+
+jobs:
+  update-nemu:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ready-to-run repo
+        uses: actions/checkout@v4
+
+      - name: Resolve commit
+        id: get_commit
+        run: |
+          set -e
+          if [ -z "${{ github.event.inputs.commit }}" ]; then
+            latest_commit=$(git ls-remote https://github.com/OpenXiangShan/NEMU.git refs/heads/master | cut -f1)
+            echo "commit=$latest_commit" >> $GITHUB_OUTPUT
+          else
+            commit=${{ github.event.inputs.commit }}
+            if ! git ls-remote https://github.com/OpenXiangShan/NEMU.git master | grep -q "$commit"; then
+              echo "The commit is not on master branch."
+              exit 1
+            fi
+            echo "commit=$commit" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download difftest-so artifact
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: ci.yml
+          workflow_conclusion: success
+          name: difftest-so
+          repo: OpenXiangShan/NEMU
+          commit: ${{ steps.get_commit.outputs.commit }}
+          path: nemu_artifacts
+          use_unzip: true
+
+      - name: Overwrite difftest-so
+        run: |
+          set -e
+          cp -r nemu_artifacts/* ./
+
+      - name: Update .nemu-version
+        run: |
+          set -e
+          echo "${{ steps.get_commit.outputs.commit }}" > .nemu-version
+
+      - name: Collect commit messages since last update
+        id: collect_msgs
+        run: |
+          set -e
+          commit=${{ steps.get_commit.outputs.commit }}
+          last_commit=""
+          if [ -f .nemu-version ]; then
+            last_commit=$(cat .nemu-version || true)
+          fi
+          git clone --no-checkout https://github.com/OpenXiangShan/NEMU.git /tmp/nemu
+          cd /tmp/nemu
+          if [ -n "$last_commit" ]; then
+            msgs=$(git log --oneline ${last_commit}..${commit} | cut -d' ' -f2-)
+          else
+            msgs=$(git log -1 --oneline ${commit} | cut -d' ' -f2-)
+          fi
+          echo "msgs<<EOF" >> $GITHUB_OUTPUT
+          echo "$msgs" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Commit and push changes
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          {
+            echo "* NEMU commit: ${{ steps.get_commit.outputs.commit }}"
+            echo ""
+            echo "Including:"
+            echo "${{ steps.collect_msgs.outputs.msgs }}" | sed 's/^/* /'
+          } > commit_msg.txt
+
+          git add difftest-so .nemu-version
+          git commit -F commit_msg.txt
+          git push
